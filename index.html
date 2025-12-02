@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tisch reservieren - Metzenhof</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Schriften: Work Sans (Body), Oswald (Headline-Fallback für DIN Condensed) -->
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500&family=Oswald:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        /* Falls DIN Condensed und Benedikt lokal verfügbar sind */
+        @font-face {
+            font-family: 'DIN Condensed';
+            src: local('DIN Condensed Light'), local('DINCondensed-Light');
+            font-weight: 300;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Benedikt';
+            src: local('Benedikt Regular'), local('Benedikt-Regular');
+            font-weight: 400;
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <a href="https://www.metzenhof.at" class="logo">
+                    <img src="logo.svg" alt="Metzenhof" class="logo-img">
+                </a>
+                <nav class="nav">
+                    <a href="https://www.metzenhof.at/speisekarte/" target="_blank">Speisekarte</a>
+                    <a href="https://www.metzenhof.at/zimmer-buchen/" target="_blank">Zimmer buchen</a>
+                    <a href="https://www.metzenhof.at/kontakt/" target="_blank">Kontakt</a>
+                </nav>
+                <button class="mobile-menu-btn" aria-label="Menü öffnen">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <p class="hero-tagline">mitanaund essn</p>
+                <h1>Tisch reservieren</h1>
+                <p>Reservieren Sie Ihren Tisch im Wirtshaus Metzenhof – wir freuen uns auf Sie!</p>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Booking Form -->
+            <section class="booking-section">
+                <div class="booking-container">
+                    <h2>Ihre Reservierung</h2>
+                    <p class="booking-subtitle">Füllen Sie das Formular aus – wir bestätigen Ihre Reservierung per E-Mail.</p>
+
+                    <form id="bookingForm" class="booking-form">
+                        <!-- Step 1: Date & Time & Guests -->
+                        <div class="form-step active" data-step="1">
+                            <h3 class="step-title">
+                                <span class="step-number">1</span>
+                                Datum & Uhrzeit
+                            </h3>
+                            
+                            <div class="form-group">
+                                <label for="date">Datum *</label>
+                                <input type="date" id="date" name="date" required>
+                                <span class="field-hint">Donnerstag bis Sonntag buchbar</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="time">Uhrzeit *</label>
+                                <select id="time" name="time" required disabled>
+                                    <option value="">Bitte zuerst Datum wählen</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="guests">Personenanzahl *</label>
+                                <select id="guests" name="guests" required>
+                                    <option value="">Bitte wählen</option>
+                                    <option value="1">1 Person</option>
+                                    <option value="2">2 Personen</option>
+                                    <option value="3">3 Personen</option>
+                                    <option value="4">4 Personen</option>
+                                    <option value="5">5 Personen</option>
+                                    <option value="6">6 Personen</option>
+                                    <option value="7">7 Personen</option>
+                                    <option value="8">8 Personen</option>
+                                    <option value="9">9 Personen</option>
+                                    <option value="10">10 Personen</option>
+                                </select>
+                            </div>
+
+                            <button type="button" class="btn btn-primary btn-next" data-next="2">
+                                Weiter zu Kontaktdaten
+                            </button>
+                        </div>
+
+                        <!-- Step 2: Contact Details -->
+                        <div class="form-step" data-step="2">
+                            <h3 class="step-title">
+                                <span class="step-number">2</span>
+                                Kontaktdaten
+                            </h3>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="firstName">Vorname *</label>
+                                    <input type="text" id="firstName" name="firstName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="lastName">Nachname *</label>
+                                    <input type="text" id="lastName" name="lastName" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">E-Mail *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone">Telefon *</label>
+                                <input type="tel" id="phone" name="phone" required placeholder="+43 ...">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="notes">Anmerkungen (optional)</label>
+                                <textarea id="notes" name="notes" rows="3" placeholder="z.B. Allergien, Kinderstuhl, besonderer Anlass..."></textarea>
+                            </div>
+
+                            <div class="form-navigation">
+                                <button type="button" class="btn btn-secondary btn-back" data-back="1">Zurück</button>
+                                <button type="button" class="btn btn-primary btn-next" data-next="3">Weiter</button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Summary -->
+                        <div class="form-step" data-step="3">
+                            <h3 class="step-title">
+                                <span class="step-number">3</span>
+                                Zusammenfassung
+                            </h3>
+
+                            <div class="summary-card">
+                                <div class="summary-section">
+                                    <h4>Reservierung</h4>
+                                    <div class="summary-row">
+                                        <span class="summary-label">Datum</span>
+                                        <span class="summary-value" id="summaryDate">-</span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span class="summary-label">Uhrzeit</span>
+                                        <span class="summary-value" id="summaryTime">-</span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span class="summary-label">Personen</span>
+                                        <span class="summary-value" id="summaryGuests">-</span>
+                                    </div>
+                                </div>
+
+                                <div class="summary-section">
+                                    <h4>Kontakt</h4>
+                                    <div class="summary-row">
+                                        <span class="summary-label">Name</span>
+                                        <span class="summary-value" id="summaryName">-</span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span class="summary-label">E-Mail</span>
+                                        <span class="summary-value" id="summaryEmail">-</span>
+                                    </div>
+                                    <div class="summary-row">
+                                        <span class="summary-label">Telefon</span>
+                                        <span class="summary-value" id="summaryPhone">-</span>
+                                    </div>
+                                    <div class="summary-row" id="summaryNotesRow" style="display: none;">
+                                        <span class="summary-label">Anmerkungen</span>
+                                        <span class="summary-value" id="summaryNotes">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="privacy-notice">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="privacy" required>
+                                    Ich akzeptiere die <a href="https://www.metzenhof.at/datenschutz/" target="_blank">Datenschutzerklärung</a> *
+                                </label>
+                            </div>
+
+                            <div class="form-navigation">
+                                <button type="button" class="btn btn-secondary btn-back" data-back="2">Zurück</button>
+                                <button type="submit" class="btn btn-primary btn-submit">Reservierung absenden</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-main">
+                <div class="footer-section">
+                    <h4>Kontakt</h4>
+                    <p>Golfplatz Kronstorf-Steyr<br>Betriebsgesellschaft mbH</p>
+                    <p>Dörfling 2<br>4484 Kronstorf</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Erreichbarkeit</h4>
+                    <p><a href="mailto:info@metzenhof.at">info@metzenhof.at</a></p>
+                    <p><a href="tel:+4372257389">+43 7225 7389</a></p>
+                </div>
+                <div class="footer-section">
+                    <h4>Wirtshaus</h4>
+                    <ul>
+                        <li><a href="https://www.metzenhof.at/oeffnungszeiten/" target="_blank">Öffnungszeiten</a></li>
+                        <li><a href="https://www.metzenhof.at/mittagsmenue/" target="_blank">Mittagsmenü</a></li>
+                        <li><a href="https://www.metzenhof.at/speisekarte/" target="_blank">Speisekarte</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Weitere Links</h4>
+                    <ul>
+                        <li><a href="https://www.metzenhof.at/zimmer-buchen/" target="_blank">Zimmer buchen</a></li>
+                        <li><a href="https://www.metzenhof.at/gutscheine/" target="_blank">Gutscheine</a></li>
+                        <li><a href="index.html">Tisch reservieren</a></li>
+                        <li><a href="admin.html">Mitarbeiter-Bereich</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-bottom-left">
+                    <img src="logo.svg" alt="Metzenhof" class="footer-logo">
+                </div>
+                <div class="footer-bottom-links">
+                    <a href="https://www.metzenhof.at/impressum/" target="_blank">Impressum</a>
+                    <a href="https://www.metzenhof.at/datenschutz/" target="_blank">Datenschutz</a>
+                    <a href="https://www.metzenhof.at/stornobedingungen/" target="_blank">Stornobedingungen</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Reservierung wird verarbeitet...</p>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-icon error">✕</div>
+            <h3>Fehler</h3>
+            <p id="errorMessage">Ein Fehler ist aufgetreten.</p>
+            <button class="btn btn-primary" onclick="closeErrorModal()">Schließen</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

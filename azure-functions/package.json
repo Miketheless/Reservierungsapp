@@ -1,0 +1,12 @@
+{
+    "name": "metzenhof-booking-api",
+    "version": "1.0.0",
+    "description": "Azure Functions Backend für Metzenhof Tischreservierung",
+    "main": "index.js",
+    "dependencies": {
+        "@microsoft/microsoft-graph-client": "^3.0.0",
+        "isomorphic-fetch": "^3.0.0"
+    }
+}
+
+

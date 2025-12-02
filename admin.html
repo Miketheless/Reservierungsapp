@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buchungskalender - Metzenhof</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600&family=Oswald:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'DIN Condensed';
+            src: local('DIN Condensed Light'), local('DINCondensed-Light');
+            font-weight: 300;
+        }
+        @font-face {
+            font-family: 'Benedikt';
+            src: local('Benedikt Regular'), local('Benedikt-Regular');
+            font-weight: 400;
+        }
+
+        * { box-sizing: border-box; }
+
+        .admin-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-main {
+            flex: 1;
+            margin-top: 74px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--color-white);
+            border-bottom: 1px solid var(--color-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .top-bar h1 {
+            font-family: 'DIN Condensed', 'Oswald', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 300;
+            color: var(--color-text);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .week-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .week-nav button {
+            background: none;
+            border: 1px solid var(--color-border);
+            padding: 0.4rem 0.75rem;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .week-nav button:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .week-label {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--color-text);
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Calendar Container */
+        .calendar-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--color-bg-alt);
+        }
+
+        /* Calendar Grid */
+        .calendar-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 70px repeat(4, 1fr);
+            grid-template-rows: auto 1fr;
+            overflow: auto;
+            background: var(--color-white);
+            margin: 1rem;
+            border: 1px solid var(--color-border);
+        }
+
+        /* Header Row */
+        .calendar-header {
+            display: contents;
+        }
+
+        .calendar-header-cell {
+            background: var(--color-bg-alt);
+            padding: 0.875rem 0.5rem;
+            text-align: center;
+            border-bottom: 2px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .calendar-header-cell.time-col {
+            border-right: 1px solid var(--color-border);
+        }
+
+        .day-name {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--color-text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .day-date {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .calendar-header-cell.today .day-date {
+            background: var(--color-primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Body */
+        .calendar-body {
+            display: contents;
+        }
+
+        .time-column {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--color-border);
+            background: var(--color-bg-alt);
+        }
+
+        .time-slot-label {
+            height: 60px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 0.25rem;
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .day-column {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--color-border);
+            position: relative;
+        }
+
+        .day-column:last-child {
+            border-right: none;
+        }
+
+        .time-slot {
+            height: 60px;
+            border-bottom: 1px solid var(--color-border);
+            position: relative;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .time-slot:hover {
+            background: rgba(80, 125, 112, 0.05);
+        }
+
+        .time-slot.half-hour {
+            border-bottom: 1px dashed #eee;
+        }
+
+        /* Booking Cards */
+        .booking-card {
+            position: absolute;
+            left: 4px;
+            right: 4px;
+            background: var(--color-primary);
+            color: white;
+            border-radius: 4px;
+            padding: 0.4rem 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            overflow: hidden;
+            z-index: 5;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .booking-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 6;
+        }
+
+        .booking-card .booking-time {
+            font-weight: 500;
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .booking-card .booking-name {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .booking-card .booking-info {
+            font-size: 0.7rem;
+            opacity: 0.85;
+        }
+
+        .booking-card.status-pending {
+            background: var(--color-accent);
+        }
+
+        .booking-card.status-cancelled {
+            background: #999;
+            opacity: 0.6;
+        }
+
+        /* Sidebar - Tagesdetails */
+        .sidebar {
+            width: 320px;
+            background: var(--color-white);
+            border-left: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            right: -320px;
+            top: 74px;
+            bottom: 0;
+            transition: right 0.3s;
+            z-index: 100;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+        }
+
+        .sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header h2 {
+            font-family: 'Benedikt', Georgia, serif;
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--color-text);
+            margin: 0;
+        }
+
+        .sidebar-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--color-text-muted);
+            padding: 0;
+            line-height: 1;
+        }
+
+        .sidebar-close:hover {
+            color: var(--color-text);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .sidebar-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--color-border);
+        }
+
+        /* Booking Detail */
+        .booking-detail {
+            background: var(--color-bg-alt);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid var(--color-primary);
+        }
+
+        .booking-detail.pending {
+            border-left-color: var(--color-accent);
+        }
+
+        .booking-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .booking-detail-time {
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .booking-detail-table {
+            font-size: 0.8rem;
+            background: var(--color-primary);
+            color: white;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+        }
+
+        .booking-detail-name {
+            font-weight: 500;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .booking-detail-info {
+            font-size: 0.85rem;
+            color: var(--color-text-light);
+        }
+
+        .booking-detail-notes {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            font-style: italic;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .booking-detail-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .booking-detail-actions button {
+            flex: 1;
+            padding: 0.4rem;
+            font-size: 0.8rem;
+        }
+
+        /* New Booking Form in Sidebar */
+        .new-booking-sidebar {
+            padding: 0;
+        }
+
+        .new-booking-sidebar .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .new-booking-sidebar label {
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .new-booking-sidebar input,
+        .new-booking-sidebar select,
+        .new-booking-sidebar textarea {
+            padding: 0.6rem 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .new-booking-sidebar textarea {
+            min-height: 60px;
+        }
+
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        /* Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 99;
+            display: none;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 2rem;
+            padding: 0.75rem 2rem;
+            background: var(--color-white);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-item .stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .stat-item .stat-label {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+        }
+
+        /* Closed Day */
+        .day-column.closed {
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0,0,0,0.02) 10px,
+                rgba(0,0,0,0.02) 20px
+            );
+        }
+
+        .day-column.closed .time-slot {
+            cursor: not-allowed;
+        }
+
+        .closed-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .calendar-grid {
+                grid-template-columns: 60px repeat(4, minmax(150px, 1fr));
+            }
+
+            .sidebar {
+                width: 100%;
+                right: -100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                padding: 0.75rem 1rem;
+            }
+
+            .top-bar h1 {
+                font-size: 1.2rem;
+            }
+
+            .week-label {
+                min-width: auto;
+                font-size: 0.9rem;
+            }
+
+            .top-bar-right {
+                width: 100%;
+            }
+
+            .top-bar-right .btn {
+                flex: 1;
+            }
+
+            .calendar-grid {
+                margin: 0.5rem;
+                grid-template-columns: 50px repeat(4, minmax(120px, 1fr));
+            }
+
+            .stats-bar {
+                padding: 0.5rem 1rem;
+                gap: 1rem;
+                overflow-x: auto;
+            }
+
+            .stat-item .stat-value {
+                font-size: 1rem;
+            }
+
+            .stat-item .stat-label {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <a href="https://www.metzenhof.at" class="logo">
+                    <img src="logo.svg" alt="Metzenhof" class="logo-img">
+                </a>
+                <nav class="nav">
+                    <a href="index.html">Kundenansicht</a>
+                    <a href="admin.html" style="color: var(--color-primary); font-weight: 500;">Kalender</a>
+                </nav>
+                <button class="mobile-menu-btn" aria-label="Menü öffnen">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main -->
+        <main class="admin-main">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    <h1>Buchungskalender</h1>
+                    <div class="week-nav">
+                        <button onclick="previousWeek()">←</button>
+                        <span class="week-label" id="weekLabel">KW 48 | 25. Nov - 1. Dez 2024</span>
+                        <button onclick="nextWeek()">→</button>
+                        <button onclick="goToToday()" style="margin-left: 0.5rem;">Heute</button>
+                    </div>
+                </div>
+                <div class="top-bar-right">
+                    <button class="btn btn-secondary" onclick="refreshCalendar()">🔄 Aktualisieren</button>
+                    <button class="btn btn-primary" onclick="openNewBooking()">+ Neue Reservierung</button>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-value" id="statToday">0</span>
+                    <span class="stat-label">Heute</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="statWeek">0</span>
+                    <span class="stat-label">Diese Woche</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="statGuests">0</span>
+                    <span class="stat-label">Gäste diese Woche</span>
+                </div>
+            </div>
+
+            <!-- Calendar -->
+            <div class="calendar-container">
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Wird dynamisch generiert -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2 id="sidebarTitle">Details</h2>
+                <button class="sidebar-close" onclick="closeSidebar()">×</button>
+            </div>
+            <div class="sidebar-content" id="sidebarContent">
+                <!-- Dynamischer Inhalt -->
+            </div>
+            <div class="sidebar-footer" id="sidebarFooter">
+                <!-- Dynamische Buttons -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Wird geladen...</p>
+    </div>
+
+    <!-- Modals -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-icon" style="background: rgba(80, 125, 112, 0.1); color: var(--color-primary);">✓</div>
+            <h3>Erfolgreich</h3>
+            <p id="successMessage">Aktion erfolgreich.</p>
+            <button class="btn btn-primary" onclick="closeModal('successModal')">OK</button>
+        </div>
+    </div>
+
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-icon error">✕</div>
+            <h3>Fehler</h3>
+            <p id="errorMessage">Ein Fehler ist aufgetreten.</p>
+            <button class="btn btn-primary" onclick="closeModal('errorModal')">Schließen</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== Configuration =====
+        const CONFIG = {
+            API_URL: 'https://YOUR-FUNCTION-APP.azurewebsites.net/api',
+            tables: [
+                { id: 'R1', capacity: 6 },
+                { id: 'R3', capacity: 6 },
+                { id: 'R5', capacity: 6 },
+                { id: 'R6', capacity: 6 },
+                { id: 'R7', capacity: 6 },
+                { id: 'R8', capacity: 6 },
+                { id: 'R9', capacity: 10 },
+                { id: 'R10', capacity: 10 },
+                { id: 'R11', capacity: 6 }
+            ],
+            // Öffnungszeiten: 0=So, 4=Do, 5=Fr, 6=Sa
+            openDays: {
+                0: { open: '11:00', close: '16:00' }, // Sonntag
+                4: { open: '11:00', close: '20:00' }, // Donnerstag
+                5: { open: '11:00', close: '20:00' }, // Freitag
+                6: { open: '11:00', close: '20:00' }  // Samstag
+            },
+            timeSlots: ['11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00']
+        };
+
+        // ===== State =====
+        let currentWeekStart = getWeekStart(new Date());
+        let bookings = [];
+
+        // Demo-Daten
+        const today = new Date();
+        const todayStr = formatDateISO(today);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = formatDateISO(tomorrow);
+
+        bookings = [
+            { code: 'MH-A3X7K9', date: todayStr, time: '12:00', firstName: 'Max', lastName: 'Mustermann', guests: 4, table: 'R1', phone: '+43 664 1234567', email: 'max@example.com', notes: '', status: 'confirmed' },
+            { code: 'MH-B2Y8L4', date: todayStr, time: '13:30', firstName: 'Anna', lastName: 'Huber', guests: 2, table: 'R3', phone: '+43 660 7654321', email: 'anna@example.com', notes: 'Vegetarisch', status: 'confirmed' },
+            { code: 'MH-X9Z3M2', date: todayStr, time: '18:00', firstName: 'Familie', lastName: 'Weber', guests: 6, table: 'R5', phone: '+43 676 9998877', email: 'weber@example.com', notes: '', status: 'confirmed' },
+            { code: 'MH-C5Z1M7', date: tomorrowStr, time: '12:30', firstName: 'Peter', lastName: 'Schmidt', guests: 6, table: 'R6', phone: '+43 676 1112233', email: 'peter@example.com', notes: 'Geburtstag!', status: 'pending' },
+            { code: 'MH-D4W2N8', date: tomorrowStr, time: '14:00', firstName: 'Maria', lastName: 'Berger', guests: 3, table: 'R7', phone: '+43 650 4445566', email: 'maria@example.com', notes: '', status: 'confirmed' },
+        ];
+
+        // ===== Initialization =====
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCalendar();
+            updateStats();
+        });
+
+        // ===== Calendar Rendering =====
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const days = getWeekDays(); // Do, Fr, Sa, So
+            
+            // Update week label
+            updateWeekLabel();
+            
+            let html = '';
+            
+            // Header row
+            html += '<div class="calendar-header">';
+            html += '<div class="calendar-header-cell time-col"></div>';
+            
+            days.forEach(day => {
+                const isToday = formatDateISO(day.date) === formatDateISO(new Date());
+                html += `
+                    <div class="calendar-header-cell ${isToday ? 'today' : ''}">
+                        <div class="day-name">${day.name}</div>
+                        <div class="day-date">${day.date.getDate()}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            // Body
+            html += '<div class="calendar-body">';
+            
+            // Time column
+            html += '<div class="time-column">';
+            CONFIG.timeSlots.forEach((slot, i) => {
+                if (i % 2 === 0) { // Nur volle Stunden anzeigen
+                    html += `<div class="time-slot-label">${slot}</div>`;
+                } else {
+                    html += `<div class="time-slot-label"></div>`;
+                }
+            });
+            html += '</div>';
+            
+            // Day columns
+            days.forEach(day => {
+                const dateStr = formatDateISO(day.date);
+                const dayOfWeek = day.date.getDay();
+                const isOpen = CONFIG.openDays[dayOfWeek];
+                const dayBookings = bookings.filter(b => b.date === dateStr && b.status !== 'cancelled');
+                
+                html += `<div class="day-column ${!isOpen ? 'closed' : ''}" data-date="${dateStr}">`;
+                
+                if (!isOpen) {
+                    html += '<div class="closed-label">Geschlossen</div>';
+                }
+                
+                CONFIG.timeSlots.forEach((slot, i) => {
+                    const isHalfHour = i % 2 === 1;
+                    html += `
+                        <div class="time-slot ${isHalfHour ? 'half-hour' : ''}" 
+                             data-date="${dateStr}" 
+                             data-time="${slot}"
+                             onclick="handleSlotClick('${dateStr}', '${slot}')">
+                        </div>
+                    `;
+                });
+                
+                // Render bookings
+                dayBookings.forEach(booking => {
+                    const top = getBookingTop(booking.time);
+                    const height = 180; // 3 Stunden = 180px
+                    html += `
+                        <div class="booking-card status-${booking.status}" 
+                             style="top: ${top}px; height: ${height}px;"
+                             onclick="event.stopPropagation(); showBookingDetail('${booking.code}')">
+                            <div class="booking-time">${booking.time} Uhr · ${booking.table}</div>
+                            <div class="booking-name">${booking.firstName} ${booking.lastName}</div>
+                            <div class="booking-info">${booking.guests} Pers. · ${booking.phone}</div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+            });
+            
+            html += '</div>';
+            
+            grid.innerHTML = html;
+        }
+
+        function getWeekDays() {
+            const days = [];
+            const dayNames = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+            
+            // Finde Do, Fr, Sa, So der aktuellen Woche
+            const thursday = new Date(currentWeekStart);
+            thursday.setDate(thursday.getDate() + (4 - thursday.getDay() + 7) % 7);
+            if (thursday < currentWeekStart) thursday.setDate(thursday.getDate() + 7);
+            
+            for (let i = 0; i < 4; i++) {
+                const date = new Date(thursday);
+                date.setDate(thursday.getDate() + i);
+                // Sonntag ist nach Samstag
+                if (i === 3) date.setDate(thursday.getDate() + 3);
+                days.push({
+                    date: new Date(thursday.getTime() + i * 24 * 60 * 60 * 1000),
+                    name: dayNames[days.length === 3 ? 0 : 4 + i]
+                });
+            }
+            
+            // Korrektur: Do, Fr, Sa, So
+            const result = [];
+            for (let i = 0; i < 4; i++) {
+                const d = new Date(currentWeekStart);
+                // Finde den nächsten Donnerstag
+                const daysUntilThursday = (4 - currentWeekStart.getDay() + 7) % 7;
+                d.setDate(currentWeekStart.getDate() + daysUntilThursday + i);
+                if (i === 3) {
+                    // Sonntag
+                    d.setDate(currentWeekStart.getDate() + daysUntilThursday + 3);
+                }
+                result.push({
+                    date: d,
+                    name: ['Do', 'Fr', 'Sa', 'So'][i]
+                });
+            }
+            
+            return result;
+        }
+
+        function getBookingTop(time) {
+            const [hours, minutes] = time.split(':').map(Number);
+            const startHour = 11;
+            const slotHeight = 60;
+            return ((hours - startHour) * 2 + (minutes / 30)) * (slotHeight / 2);
+        }
+
+        function updateWeekLabel() {
+            const days = getWeekDays();
+            const start = days[0].date;
+            const end = days[3].date;
+            const weekNum = getWeekNumber(start);
+            
+            const options = { day: 'numeric', month: 'short' };
+            const startStr = start.toLocaleDateString('de-AT', options);
+            const endStr = end.toLocaleDateString('de-AT', options);
+            
+            document.getElementById('weekLabel').textContent = 
+                `KW ${weekNum} | ${startStr} - ${endStr}`;
+        }
+
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        // ===== Navigation =====
+        function previousWeek() {
+            currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+            renderCalendar();
+            updateStats();
+        }
+
+        function nextWeek() {
+            currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+            renderCalendar();
+            updateStats();
+        }
+
+        function goToToday() {
+            currentWeekStart = getWeekStart(new Date());
+            renderCalendar();
+            updateStats();
+        }
+
+        function getWeekStart(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            d.setDate(diff);
+            d.setHours(0, 0, 0, 0);
+            return d;
+        }
+
+        // ===== Stats =====
+        function updateStats() {
+            const todayStr = formatDateISO(new Date());
+            const weekDays = getWeekDays().map(d => formatDateISO(d.date));
+            
+            const todayBookings = bookings.filter(b => b.date === todayStr && b.status !== 'cancelled');
+            const weekBookings = bookings.filter(b => weekDays.includes(b.date) && b.status !== 'cancelled');
+            const weekGuests = weekBookings.reduce((sum, b) => sum + b.guests, 0);
+            
+            document.getElementById('statToday').textContent = todayBookings.length;
+            document.getElementById('statWeek').textContent = weekBookings.length;
+            document.getElementById('statGuests').textContent = weekGuests;
+        }
+
+        // ===== Interactions =====
+        function handleSlotClick(date, time) {
+            const dayOfWeek = new Date(date).getDay();
+            if (!CONFIG.openDays[dayOfWeek]) return;
+            
+            openNewBooking(date, time);
+        }
+
+        function showBookingDetail(code) {
+            const booking = bookings.find(b => b.code === code);
+            if (!booking) return;
+            
+            const dateObj = new Date(booking.date);
+            const dateStr = dateObj.toLocaleDateString('de-AT', { weekday: 'long', day: 'numeric', month: 'long' });
+            
+            document.getElementById('sidebarTitle').textContent = dateStr;
+            document.getElementById('sidebarContent').innerHTML = `
+                <div class="booking-detail ${booking.status === 'pending' ? 'pending' : ''}">
+                    <div class="booking-detail-header">
+                        <span class="booking-detail-time">${booking.time} Uhr</span>
+                        <span class="booking-detail-table">${booking.table}</span>
+                    </div>
+                    <div class="booking-detail-name">${booking.firstName} ${booking.lastName}</div>
+                    <div class="booking-detail-info">
+                        ${booking.guests} Personen<br>
+                        📞 ${booking.phone}<br>
+                        ✉️ ${booking.email}
+                    </div>
+                    ${booking.notes ? `<div class="booking-detail-notes">"${booking.notes}"</div>` : ''}
+                    <div class="booking-detail-actions">
+                        <button class="btn btn-secondary" onclick="editBooking('${booking.code}')">Bearbeiten</button>
+                        <button class="btn btn-secondary" style="color: var(--color-error);" onclick="cancelBooking('${booking.code}')">Stornieren</button>
+                    </div>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 1rem;">
+                    Code: <strong>${booking.code}</strong><br>
+                    Status: ${booking.status === 'confirmed' ? 'Bestätigt' : 'Ausstehend'}
+                </p>
+            `;
+            document.getElementById('sidebarFooter').innerHTML = `
+                <button class="btn btn-primary" style="width: 100%;" onclick="closeSidebar()">Schließen</button>
+            `;
+            
+            openSidebar();
+        }
+
+        function openNewBooking(date = '', time = '') {
+            document.getElementById('sidebarTitle').textContent = 'Neue Reservierung';
+            document.getElementById('sidebarContent').innerHTML = `
+                <form id="newBookingForm" class="new-booking-sidebar">
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Datum *</label>
+                            <input type="date" id="newDate" value="${date}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Uhrzeit *</label>
+                            <select id="newTime" required>
+                                <option value="">Wählen</option>
+                                ${CONFIG.timeSlots.slice(0, -6).map(t => `<option value="${t}" ${t === time ? 'selected' : ''}>${t}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Personen *</label>
+                            <select id="newGuests" required>
+                                <option value="">Wählen</option>
+                                ${[1,2,3,4,5,6,7,8,9,10].map(n => `<option value="${n}">${n}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tisch</label>
+                            <select id="newTable">
+                                <option value="">Auto</option>
+                                ${CONFIG.tables.map(t => `<option value="${t.id}">${t.id} (${t.capacity}P)</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Vorname *</label>
+                            <input type="text" id="newFirstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nachname *</label>
+                            <input type="text" id="newLastName" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>E-Mail *</label>
+                        <input type="email" id="newEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Telefon *</label>
+                        <input type="tel" id="newPhone" required placeholder="+43 ...">
+                    </div>
+                    <div class="form-group">
+                        <label>Anmerkungen</label>
+                        <textarea id="newNotes" placeholder="Optional..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label" style="font-size: 0.85rem;">
+                            <input type="checkbox" id="newSendEmail" checked>
+                            E-Mail an Kunden senden
+                        </label>
+                    </div>
+                </form>
+            `;
+            document.getElementById('sidebarFooter').innerHTML = `
+                <button class="btn btn-primary" style="width: 100%;" onclick="saveNewBooking()">Reservierung speichern</button>
+            `;
+            
+            openSidebar();
+        }
+
+        async function saveNewBooking() {
+            const form = document.getElementById('newBookingForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const newBooking = {
+                code: generateCode(),
+                date: document.getElementById('newDate').value,
+                time: document.getElementById('newTime').value,
+                guests: parseInt(document.getElementById('newGuests').value),
+                table: document.getElementById('newTable').value || selectBestTable(parseInt(document.getElementById('newGuests').value)),
+                firstName: document.getElementById('newFirstName').value,
+                lastName: document.getElementById('newLastName').value,
+                email: document.getElementById('newEmail').value,
+                phone: document.getElementById('newPhone').value,
+                notes: document.getElementById('newNotes').value,
+                status: 'confirmed'
+            };
+            
+            bookings.push(newBooking);
+            closeSidebar();
+            renderCalendar();
+            updateStats();
+            showSuccess(`Reservierung ${newBooking.code} erstellt!`);
+        }
+
+        function editBooking(code) {
+            const booking = bookings.find(b => b.code === code);
+            if (!booking) return;
+            
+            // Remove from list and open form
+            bookings = bookings.filter(b => b.code !== code);
+            openNewBooking(booking.date, booking.time);
+            
+            // Fill form
+            setTimeout(() => {
+                document.getElementById('newGuests').value = booking.guests;
+                document.getElementById('newTable').value = booking.table;
+                document.getElementById('newFirstName').value = booking.firstName;
+                document.getElementById('newLastName').value = booking.lastName;
+                document.getElementById('newEmail').value = booking.email;
+                document.getElementById('newPhone').value = booking.phone;
+                document.getElementById('newNotes').value = booking.notes || '';
+            }, 100);
+        }
+
+        function cancelBooking(code) {
+            if (!confirm('Reservierung wirklich stornieren?')) return;
+            
+            const booking = bookings.find(b => b.code === code);
+            if (booking) {
+                booking.status = 'cancelled';
+                closeSidebar();
+                renderCalendar();
+                updateStats();
+                showSuccess('Reservierung storniert.');
+            }
+        }
+
+        // ===== Sidebar =====
+        function openSidebar() {
+            document.getElementById('sidebar').classList.add('open');
+            document.getElementById('sidebarOverlay').classList.add('active');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        }
+
+        // ===== Utilities =====
+        function formatDateISO(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function generateCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = 'MH-';
+            for (let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        function selectBestTable(guests) {
+            const suitable = CONFIG.tables.filter(t => t.capacity >= guests).sort((a, b) => a.capacity - b.capacity);
+            return suitable.length > 0 ? suitable[0].id : 'R1';
+        }
+
+        function refreshCalendar() {
+            renderCalendar();
+            updateStats();
+            showSuccess('Kalender aktualisiert.');
+        }
+
+        function showSuccess(message) {
+            document.getElementById('successMessage').textContent = message;
+            document.getElementById('successModal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+    </script>
+</body>
+</html>
