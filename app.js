@@ -1,7 +1,7 @@
 // ===== Configuration =====
 const CONFIG = {
     // Azure Function URL - hier nach dem Deployment die URL eintragen
-    API_URL: 'https://metzenhof-booking.azurewebsites.net/api',
+    API_URL: 'metzenhof-booking-hwhdcbaxb2dufggp.westeurope-01.azurewebsites.net/api',
     
     // Tische mit Kapazität (werden automatisch zugewiesen)
     tables: [
@@ -337,5 +337,6 @@ function closeErrorModal() {
 }
 
 window.closeErrorModal = closeErrorModal;
+
 
 
